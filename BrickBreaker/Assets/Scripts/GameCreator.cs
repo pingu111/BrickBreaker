@@ -9,20 +9,11 @@ public class GameCreator : MonoBehaviour
     [SerializeField]
     private GameObject m_BrickContainer = null;
 
+    /// <summary>
+    /// Initialize the game, bricks
+    /// </summary>
     public void CreateGame()
     {
-        if (m_PrefabBrick == null)
-        {
-            Debug.LogError("No brick prefab atttached");
-            return;
-        }
-
-        if (m_BrickContainer == null)
-        {
-            Debug.LogError("No brick container atttached");
-            return;
-        }
-
         // first, set the size of the container to fit the screen as wanted
         float wantedWidth = 1.0f * Camera.main.orthographicSize * 2.0f * Screen.width / Screen.height;
         float wantedHeight = 0.5f * Camera.main.orthographicSize * 2.0f * Screen.height / Screen.width;
@@ -34,6 +25,9 @@ public class GameCreator : MonoBehaviour
         CreateBricks();
     }
 
+    /// <summary>
+    /// Create the bricks, the container needs to be created
+    /// </summary>
     private void CreateBricks()
     {
         //TODO : add in a file
@@ -60,10 +54,9 @@ public class GameCreator : MonoBehaviour
                 newBrick.transform.SetParent(m_BrickContainer.transform);
 
                 newBrick.GetComponent<MeshRenderer>().material.color = new Color(UnityEngine.Random.Range(0, 100)/100.0f, UnityEngine.Random.Range(0, 100)/100.0f, UnityEngine.Random.Range(0, 100)/100.0f);
-
+                newBrick.GetComponent<BrickBehaviour>().InitThisbrick(BrickType.Normal);
             }
         }
 
     }
-
 }
