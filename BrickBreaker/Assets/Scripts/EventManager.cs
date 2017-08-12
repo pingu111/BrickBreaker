@@ -86,11 +86,14 @@ public static class EventManager
     /// <param name="eventToCall">The event to raise</param>
     public static void raise(EventType eventToCall)
     {
-        foreach (Delegate d in dicoEventAction[eventToCall].ToArray())
+        if (dicoEventAction.ContainsKey(eventToCall))
         {
-            Callback c = (Callback)d;
-            if (c != null)
-                c();
+            foreach (Delegate d in dicoEventAction[eventToCall].ToArray())
+            {
+                Callback c = (Callback)d;
+                if (c != null)
+                    c();
+            }
         }
     }
 
@@ -102,11 +105,14 @@ public static class EventManager
 
     public static void raise<T>(EventType eventToCall, T arg)
     {
-        foreach (Delegate d in dicoEventAction[eventToCall].ToArray())
+        if(dicoEventAction.ContainsKey(eventToCall))
         {
-            Callback<T> c = (Callback<T>)d;
-            if (c != null)
-                c(arg);
+            foreach (Delegate d in dicoEventAction[eventToCall].ToArray())
+            {
+                Callback<T> c = (Callback<T>)d;
+                if (c != null)
+                    c(arg);
+            }
         }
     }
 }

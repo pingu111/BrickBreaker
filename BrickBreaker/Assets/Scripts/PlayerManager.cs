@@ -12,8 +12,34 @@ public static class PlayerPreferences
 /// </summary>
 public static class PlayerStatistics
 {
-    public static int PlayerNbPoints = 0;
-    public static int PlayerNbLifes = 3;
+    private static int m_PlayerNbPoints = 0;
+    public static int PlayerNbPoints
+    {
+        get
+        {
+            return m_PlayerNbPoints;
+        }
+        set
+        {
+            EventManager.raise<int>(EventType.PLAYER_NUMBER_SCORE_CHANGED, value);
+            m_PlayerNbPoints = value;
+        }
+    }
+
+    private static int m_PlayerNbLifes = 3;
+    public static int PlayerNbLifes
+    {
+        get
+        {
+            return m_PlayerNbLifes;
+        }
+        set
+        {
+            EventManager.raise<int>(EventType.PLAYER_NUMBER_LIFE_CHANGED, value);
+            m_PlayerNbLifes = value;
+        }
+    }
+
     public static int PlayerInitLifes = 3;
 
     public static void ResetPlayer()

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
 public class GameCreator : MonoBehaviour
 {
@@ -21,11 +23,15 @@ public class GameCreator : MonoBehaviour
     [SerializeField]
     private GameObject m_Ceil = null;
 
+    private Dictionary<int, BrickBehaviour> m_DictionnaryBrickID = new Dictionary<int, BrickBehaviour>();
+
     /// <summary>
     /// Initialize the game, bricks
     /// </summary>
     public void CreateGame()
     {
+        m_DictionnaryBrickID.Clear();
+
         float heightRatio = 0.6f;
 
         // first, set the size of the container to fit the screen as wanted
@@ -79,6 +85,9 @@ public class GameCreator : MonoBehaviour
         Vector3 firstPosition = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, 0f));
         firstPosition.z = m_BrickContainer.transform.position.z;
 
+        int idBrick = 0;
+
+        var possibleTypes = Enum.GetValues((typeof(BrickType)));
         for (int i = 0; i < nbBricksX; i ++)
         {
             for (int j = 0; j < nbBricksY; j++)
@@ -92,10 +101,43 @@ public class GameCreator : MonoBehaviour
                     firstPosition.z);
                 newBrick.transform.SetParent(m_BrickContainer.transform);
 
-                newBrick.GetComponent<MeshRenderer>().material.color = new Color(UnityEngine.Random.Range(0, 100)/100.0f, UnityEngine.Random.Range(0, 100)/100.0f, UnityEngine.Random.Range(0, 100)/100.0f);
-                newBrick.GetComponent<BrickBehaviour>().InitThisbrick(BrickType.Normal);
+                newBrick.GetComponent<BrickBehaviour>().SetStateThisBrick((BrickType)possibleTypes.GetValue(UnityEngine.Random.Range(0, possibleTypes.Length)), this);
+
+                m_DictionnaryBrickID.Add(idBrick, newBrick.GetComponent<BrickBehaviour>());
+                idBrick++;
             }
         }
-
     }
+
+    public void OnBrickWasTouched(BrickBehaviour brickTouched)
+    {
+        switch (brickTouched.m_ThisBrickType)
+        {
+            case BrickType.Normal:
+                Destroy(brickTouched.gameObject, 0.1f);
+                PlayerStatistics.PlayerNbPoints += 100;
+                break;
+            case BrickType.PowerUp_Life:
+                Destroy(brickTouched.gameObject, 0.1f);
+                PlayerStatistics.PlayerNbPoints += 100;
+                PlayerStatistics.PlayerNbLifes += 1;
+                break;
+            case BrickType.PowerUp_Speed:
+                Destroy(brickTouched.gameObject, 0.1f);
+                PlayerStatistics.PlayerNbPoints += 100;
+                break;
+            case BrickType.PowerUp_Ball:
+                Destroy(brickTouched.gameObject, 0.1f);
+                PlayerStatistics.PlayerNbPoints += 100;
+                break;
+            case BrickType.Strong:
+                brickTouched.SetStateThisBrick(BrickType.Normal, this);
+                break;
+            case BrickType.SuperStrong:
+                brickTouched.SetStateThisBrick(BrickType.Strong, this);
+                break;
+        }  
+    }
+
+
 }
