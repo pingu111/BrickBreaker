@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
+﻿
 /// <summary>
 /// Preferences of the player, its settings
 /// </summary>
@@ -16,10 +14,12 @@ public static class PlayerStatistics
 {
     public static int PlayerNbPoints = 0;
     public static int PlayerNbLifes = 3;
+    public static int PlayerInitLifes = 3;
 
-}
-
-public class PlayerManager : MonoBehaviour
-{
+    public static void ResetPlayer()
+    {
+        PlayerNbPoints = 0;
+        PlayerNbLifes = PlayerInitLifes;
+    }
 
 }

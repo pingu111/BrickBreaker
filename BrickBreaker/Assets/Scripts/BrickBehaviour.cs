@@ -24,8 +24,9 @@ public class BrickBehaviour : MonoBehaviour
         if (collision.transform.GetComponent<Ball>() != null)
         {
             PlayerStatistics.PlayerNbPoints += 100;
-            Debug.Log("Destroying " + this.gameObject);
-           // Destroy(this.gameObject, 0.1f);
+            EventManager.raise(EventType.PLAYER_NUMBER_SCORE_CHANGED, PlayerStatistics.PlayerNbPoints);
+
+            Destroy(this.gameObject, 0.1f);
         }
     }
 }

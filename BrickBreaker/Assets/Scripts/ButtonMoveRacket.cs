@@ -2,6 +2,10 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// Allow a button to be maintened, 
+/// and will call the input maanger each frame that this button is clicked
+/// </summary>
 public class ButtonMoveRacket : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField]
@@ -35,6 +39,7 @@ public class ButtonMoveRacket : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         m_IsCurrentlyPressed = false;
         this.GetComponent<UnityEngine.UI.Image>().color = Color.white;
     }
+
 
     void Update()
     {

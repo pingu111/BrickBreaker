@@ -20,6 +20,7 @@ public class GameCreator : MonoBehaviour
 
     [SerializeField]
     private GameObject m_Ceil = null;
+
     /// <summary>
     /// Initialize the game, bricks
     /// </summary>

@@ -8,7 +8,7 @@ public class Ground : MonoBehaviour {
         if(collision.transform.GetComponent<Ball>() != null)
         {
             PlayerStatistics.PlayerNbLifes--;
-            Debug.Log("Player lost a life");
+            EventManager.raise(EventType.PLAYER_NUMBER_LIFE_CHANGED, PlayerStatistics.PlayerNbLifes);
         }
     }
 }

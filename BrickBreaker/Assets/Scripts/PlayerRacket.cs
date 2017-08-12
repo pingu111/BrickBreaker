@@ -8,6 +8,9 @@ public class PlayerRacket : MonoBehaviour
     /// </summary>
     private float m_ClampedPositionX = -1.0f;
 
+    /// <summary>
+    /// Set the intiail position of the racket
+    /// </summary>
 	public void InitRacket()
     {
         float wantedWidth = 0.2f * Camera.main.orthographicSize * Screen.width / Screen.height;
@@ -17,6 +20,10 @@ public class PlayerRacket : MonoBehaviour
         m_ClampedPositionX = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x - this.GetComponent<CapsuleCollider>().bounds.size.x / 2;
     }
 
+    /// <summary>
+    /// Move the racket with the offset in argument
+    /// </summary>
+    /// <param name="offsetX"></param>
     public void RacketGoToX(float offsetX)
     {
         if (this.transform.localPosition.x + offsetX > m_ClampedPositionX)
