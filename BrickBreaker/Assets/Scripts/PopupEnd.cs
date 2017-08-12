@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PopupEnd : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class PopupEnd : MonoBehaviour
 
     [SerializeField]
     private GameObject m_TextLost = null;
+
+    [SerializeField]
+    private Text m_HighestScoreText = null;
 
     /// <summary>
     /// Init the popup
@@ -25,6 +29,7 @@ public class PopupEnd : MonoBehaviour
     /// </summary>
     public void OnWon()
     {
+        GetHighScore();
         if (!this.gameObject.activeSelf)
             this.gameObject.SetActive(true);
         if (m_TextLost.activeSelf)
@@ -38,12 +43,25 @@ public class PopupEnd : MonoBehaviour
     /// </summary>
     public void OnLost()
     {
+        GetHighScore();
         if (!this.gameObject.activeSelf)
             this.gameObject.SetActive(true);
         if (m_TextWon.activeSelf)
             m_TextWon.SetActive(false);
         if (!m_TextLost.activeSelf)
             m_TextLost.SetActive(true);
+    }
+
+    private void GetHighScore()
+    {
+        if(PlayerPrefs.HasKey("Highscore"))
+        {
+            m_HighestScoreText.text = "Highscore = " + PlayerPrefs.GetInt("Highscore");
+        }
+        else
+        {
+            m_HighestScoreText.text = "Pas encore de highscore... Courage !";
+        }
     }
 
     /// <summary>

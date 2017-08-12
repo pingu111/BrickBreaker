@@ -102,7 +102,7 @@ public class GameCreator : MonoBehaviour
         if (nbBricksX == 0 || nbBricksY == 0)
             return;
 
-        Vector3 scaleOneBrick = new Vector3(m_BrickContainer.transform.localScale.x / (float)nbBricksX, m_BrickContainer.transform.localScale.y / (float)nbBricksY, 1);
+        Vector3 scaleOneBrick = new Vector3(m_BrickContainer.transform.localScale.x / (float)nbBricksX, m_BrickContainer.transform.localScale.y / (float)nbBricksY, m_BrickContainer.transform.localScale.x / (float)nbBricksX);
         float offsetX = m_PrefabBrick.GetComponent<MeshRenderer>().bounds.size.x * scaleOneBrick.x / m_PrefabBrick.transform.localScale.x;
         float offsetY = m_PrefabBrick.GetComponent<MeshRenderer>().bounds.size.y * scaleOneBrick.y / m_PrefabBrick.transform.localScale.y;
         Vector3 firstPosition = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, 0f));
@@ -139,65 +139,121 @@ public class GameCreator : MonoBehaviour
             return BrickType.SuperStrong;
         else if (randomInt < 15)
             return BrickType.Strong;
-        else if (randomInt < 25)
+        else if (randomInt < 30)
             return BrickType.PowerUp_Ball;
-        else if (randomInt < 40)
+        else if (randomInt < 45)
             return BrickType.PowerUp_Life;
-        else if (randomInt < 60)
+        else if (randomInt < 70)
             return BrickType.PowerUp_Speed;
         else
             return BrickType.Normal;
     }
 
     /// <summary>
-    /// To call when a brick is hitten, apply the rules of the given brick
+    /// To call when a falling brick is hitten, apply the rules of the given brick :
+    /// change its state or destroy it, applying its bonus
     /// </summary>
     /// <param name="brickTouched"></param>
-    public void OnBrickWasTouched(BrickBehaviour brickTouched)
+    public void OnBrickFallingTouched(BrickBehaviour brickTouched, bool touchedByBall)
     {
         switch (brickTouched.m_ThisBrickType)
         {
             case BrickType.Normal:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
-
-                PlayerStatistics.PlayerNbPoints += 100;
+                if(touchedByBall)
+                    PlayerStatistics.PlayerNbPoints += 350;
                 break;
             case BrickType.PowerUp_Life:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
-
-                PlayerStatistics.PlayerNbPoints += 100;
-                PlayerStatistics.PlayerNbLifes += 1;
+                if (touchedByBall)
+                {
+                    PlayerStatistics.PlayerNbPoints += 300;
+                    PlayerStatistics.PlayerNbLifes += 2;
+                }
                 break;
             case BrickType.PowerUp_Speed:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
-
-                PlayerStatistics.BallsSpeed += 0.25f;
-                PlayerStatistics.PlayerNbPoints += 100;
+                if (touchedByBall)
+                {
+                    PlayerStatistics.BallsSpeed += 0.25f;
+                    PlayerStatistics.PlayerNbPoints += 300;
+                }
                 break;
             case BrickType.PowerUp_Ball:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
-
-                CreateBallAtRacket();
-                PlayerStatistics.PlayerNbPoints += 100;
+                if (touchedByBall)
+                {
+                    CreateBallAtRacket();
+                    PlayerStatistics.PlayerNbPoints += 300;
+                }
                 break;
+            case BrickType.Strong:
+                if(touchedByBall)
+                {
+                    brickTouched.SetStateThisBrick(BrickType.Normal, this);
+                    PlayerStatistics.PlayerNbPoints += 500;
+                }
+                else
+                {
+                    // destroy it because touched by the ground
+                    brickTouched.DestroyThisBrick();
+                    NbRemainingBricks--;
+                }
+                break;
+            case BrickType.SuperStrong:
+                if (touchedByBall)
+                {
+                    brickTouched.SetStateThisBrick(BrickType.Strong, this);
+                    PlayerStatistics.PlayerNbPoints += 1000;
+                }
+                else
+                {
+                    // destroy it because touched by the ground
+                    brickTouched.DestroyThisBrick();
+                    NbRemainingBricks--;
+                }
+                break;
+        }
+
+        if (NbRemainingBricks == 0)
+        {
+            if(!PlayerStatistics.GameEnded)
+            {
+                PlayerStatistics.GameEnded = true;
+                PlayerPrefs.SetInt("Highscore", PlayerStatistics.PlayerNbPoints);
+                EventManager.raise(EventType.PLAYER_WON);
+            }
+
+        }
+    }
+
+    /// <summary>
+    /// To call when a brick, non falling, is touched by a ball :
+    /// Change its state or set it as falling
+    /// </summary>
+    /// <param name="brickTouched"></param>
+    public void NonFallingBrickTouchedByBall(BrickBehaviour brickTouched)
+    {
+        switch (brickTouched.m_ThisBrickType)
+        {
             case BrickType.Strong:
                 brickTouched.SetStateThisBrick(BrickType.Normal, this);
                 break;
             case BrickType.SuperStrong:
                 brickTouched.SetStateThisBrick(BrickType.Strong, this);
                 break;
+            default:
+                PlayerStatistics.PlayerNbPoints += 50;
+                brickTouched.GetComponent<Rigidbody>().isKinematic = false;
+                brickTouched.m_IsBrickFalling = true;
+                brickTouched.gameObject.layer = LayerMask.NameToLayer("FallingBrick");
+                break;
         }
-
-        if (NbRemainingBricks == 0)
-        {
-            PlayerStatistics.GameEnded = true;
-            EventManager.raise(EventType.PLAYER_WON);
-        }
-    }
+     }
 
     /// <summary>
     /// Create and launch a ball from the racket

@@ -41,6 +41,7 @@ public class HUDDisplayer : MonoBehaviour {
     /// <param name="newScore"></param>
     public void SetScore(int newScore)
     {
+        this.GetComponent<Animator>().SetTrigger("PlayerScoreChanged");
         m_NumberPointsText.text = newScore.ToString();
     }
 
@@ -50,6 +51,7 @@ public class HUDDisplayer : MonoBehaviour {
     /// <param name="newLife"></param>
     public void SetLifes(int newLife)
     {
+        this.GetComponent<Animator>().SetTrigger("PlayerLifeChanged");
         m_NumberLifesText.text = newLife.ToString();
     }
 }

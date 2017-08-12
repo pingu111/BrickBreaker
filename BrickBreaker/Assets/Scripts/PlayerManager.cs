@@ -37,18 +37,18 @@ public static class PlayerStatistics
         {
             EventManager.raise<int>(EventType.PLAYER_NUMBER_LIFE_CHANGED, value);
             m_PlayerNbLifes = value;
-         /*   if (m_PlayerNbLifes == 0)
+            if (m_PlayerNbLifes == 0)
             {
                 GameEnded = true;
                 EventManager.raise(EventType.PLAYER_LOST);
-            }*/
+            }
         }
     }
 
-    public static int PlayerInitLifes = 3;
+    public static int PlayerInitLifes = 5;
 
     public static float BallsSpeed = 3.0f;
-    private static float BallsInitSpeed = 3.0f;
+    private static float BallsInitSpeed = 4.0f;
 
     public static bool GameEnded = false;
 

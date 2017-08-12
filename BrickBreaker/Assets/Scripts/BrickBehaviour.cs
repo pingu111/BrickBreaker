@@ -37,6 +37,8 @@ public class BrickBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject m_ExplostionPrefab;
 
+    public bool m_IsBrickFalling = false;
+
     /// <summary>
     /// Init this brick with the given state
     /// </summary>
@@ -77,7 +79,19 @@ public class BrickBehaviour : MonoBehaviour
     {
         if (collision.transform.GetComponent<Ball>() != null)
         {
-            m_Creator.OnBrickWasTouched(this);
+            if (m_IsBrickFalling)
+                m_Creator.OnBrickFallingTouched(this, true);
+            else
+            {
+                m_Creator.NonFallingBrickTouchedByBall(this);
+            }
+        }
+        else if (collision.transform.GetComponent<Ground>() != null)
+        {
+            if(m_IsBrickFalling)
+            {
+                m_Creator.OnBrickFallingTouched(this, false);
+            }
         }
     }
 
