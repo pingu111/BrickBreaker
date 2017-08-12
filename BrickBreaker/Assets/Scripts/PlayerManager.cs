@@ -15,6 +15,8 @@ public static class PlayerPreferences
 public static class PlayerStatistics
 {
     public static int PlayerNbPoints = 0;
+    public static int PlayerNbLifes = 3;
+
 }
 
 public class PlayerManager : MonoBehaviour
