@@ -34,6 +34,9 @@ public class BrickBehaviour : MonoBehaviour
     private Material m_SpeedMaterial = null;
     #endregion
 
+    [SerializeField]
+    private GameObject m_ExplostionPrefab;
+
     /// <summary>
     /// Init this brick with the given state
     /// </summary>
@@ -76,5 +79,12 @@ public class BrickBehaviour : MonoBehaviour
         {
             m_Creator.OnBrickWasTouched(this);
         }
+    }
+
+    public void DestroyThisBrick()
+    {
+        GameObject explosion = Instantiate(m_ExplostionPrefab);
+        explosion.transform.position = this.transform.position;
+        Destroy(this.gameObject, 0.01f);
     }
 }

@@ -20,6 +20,7 @@ public class HUDDisplayer : MonoBehaviour {
     {
         if(!this.gameObject.activeSelf)
             this.gameObject.SetActive(true);
+
         SetScore(PlayerStatistics.PlayerNbPoints);
         SetLifes(PlayerStatistics.PlayerNbLifes);
         m_PopupGameOver.Init();

@@ -13,9 +13,9 @@ public class PlayerRacket : MonoBehaviour
     /// </summary>
 	public void InitRacket()
     {
-        float wantedWidth = 0.2f * Camera.main.orthographicSize * Screen.width / Screen.height;
+        float wantedWidth = 0.3f * Camera.main.orthographicSize * Screen.width / Screen.height;
         this.transform.localScale = new Vector3(this.transform.localScale.x, wantedWidth, this.transform.localScale.z);
-        this.transform.localPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.5f, Screen.height * 0.05f, 0));
+        this.transform.localPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.5f, -this.GetComponent<CapsuleCollider>().bounds.size.y / 2, 0));
 
         m_ClampedPositionX = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x - this.GetComponent<CapsuleCollider>().bounds.size.x / 2;
     }

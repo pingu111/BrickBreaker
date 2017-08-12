@@ -19,25 +19,25 @@ public class ButtonMoveRacket : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerDown(PointerEventData eventData)
     {
         m_IsCurrentlyPressed = true;
-        this.GetComponent<UnityEngine.UI.Image>().color = Color.red;
+        this.GetComponent<UnityEngine.UI.Image>().color = new Color(1, 0, 0, 0.2f);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         m_IsCurrentlyPressed = true;
-        this.GetComponent<UnityEngine.UI.Image>().color = Color.red;
+        this.GetComponent<UnityEngine.UI.Image>().color = new Color(1, 0, 0, 0.2f);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         m_IsCurrentlyPressed = false;
-        this.GetComponent<UnityEngine.UI.Image>().color = Color.white;
+        this.GetComponent<UnityEngine.UI.Image>().color = new Color(1, 1, 1, 0.2f);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         m_IsCurrentlyPressed = false;
-        this.GetComponent<UnityEngine.UI.Image>().color = Color.white;
+        this.GetComponent<UnityEngine.UI.Image>().color = new Color(1, 1, 1, 0.2f);
     }
 
 

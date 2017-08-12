@@ -10,6 +10,8 @@ public class Ball : MonoBehaviour
     public void LateUpdate ()
     {
         this.GetComponent<Rigidbody>().velocity = Vector3.Normalize(this.GetComponent<Rigidbody>().velocity) * PlayerStatistics.BallsSpeed;
+        if (PlayerStatistics.GameEnded)
+            DestroyBall();
     }
 
     /// <summary>
@@ -30,7 +32,7 @@ public class Ball : MonoBehaviour
     /// </summary>
     public void DestroyBall()
     {
-        Destroy(this.gameObject);
+        Destroy(this.gameObject,0);
     }
 
     void OnDestroy()

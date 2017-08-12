@@ -6,7 +6,7 @@ public class InputManager : MonoBehaviour {
     [SerializeField]
     private PlayerRacket m_PlayerRacket = null;
 
-    private float m_Speed = 0.1f;
+    private float m_Speed = 0.15f;
 
 	// Update is called once per frame
 	void Update ()

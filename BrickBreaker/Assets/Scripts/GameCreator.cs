@@ -32,7 +32,18 @@ public class GameCreator : MonoBehaviour
     /// <summary>
     /// Number of remaining bricks on the game, when 0, player won
     /// </summary>
-    private int m_NbRemainingBricks = -1;
+    private int m_NbRemainingBricks = 0;
+    public int NbRemainingBricks
+    {
+        get
+        {
+            return m_NbRemainingBricks;
+        }
+        set
+        {
+            m_NbRemainingBricks = value;
+        }
+    }
 
     /// <summary>
     /// Initialize the game, bricks
@@ -82,6 +93,8 @@ public class GameCreator : MonoBehaviour
     /// </summary>
     private void CreateBricks()
     {
+        NbRemainingBricks = 0;
+
         //TODO : add in a file
         int nbBricksX = 10;
         int nbBricksY = 8;
@@ -95,7 +108,6 @@ public class GameCreator : MonoBehaviour
         Vector3 firstPosition = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, 0f));
         firstPosition.z = m_BrickContainer.transform.position.z;
 
-        var possibleTypes = Enum.GetValues((typeof(BrickType)));
         for (int i = 0; i < nbBricksX; i ++)
         {
             for (int j = 0; j < nbBricksY; j++)
@@ -110,12 +122,15 @@ public class GameCreator : MonoBehaviour
                 newBrick.transform.SetParent(m_BrickContainer.transform);
 
                 newBrick.GetComponent<BrickBehaviour>().SetStateThisBrick(GetRandomBrickType(), this);
-                m_NbRemainingBricks++;
+                NbRemainingBricks++;
             }
         }
     }
 
-
+    /// <summary>
+    /// Returns a random bricktype, with probabilties of each type 
+    /// </summary>
+    /// <returns></returns>
     public BrickType GetRandomBrickType()
     {
         int randomInt = UnityEngine.Random.Range(0, 100);
@@ -135,7 +150,7 @@ public class GameCreator : MonoBehaviour
     }
 
     /// <summary>
-    /// To call whe na brick is hitten, apply the rules of the given brick
+    /// To call when a brick is hitten, apply the rules of the given brick
     /// </summary>
     /// <param name="brickTouched"></param>
     public void OnBrickWasTouched(BrickBehaviour brickTouched)
@@ -143,28 +158,28 @@ public class GameCreator : MonoBehaviour
         switch (brickTouched.m_ThisBrickType)
         {
             case BrickType.Normal:
-                Destroy(brickTouched.gameObject, 0.1f);
-                m_NbRemainingBricks--;
+                brickTouched.DestroyThisBrick();
+                NbRemainingBricks--;
 
                 PlayerStatistics.PlayerNbPoints += 100;
                 break;
             case BrickType.PowerUp_Life:
-                Destroy(brickTouched.gameObject, 0.1f);
-                m_NbRemainingBricks--;
+                brickTouched.DestroyThisBrick();
+                NbRemainingBricks--;
 
                 PlayerStatistics.PlayerNbPoints += 100;
                 PlayerStatistics.PlayerNbLifes += 1;
                 break;
             case BrickType.PowerUp_Speed:
-                Destroy(brickTouched.gameObject, 0.1f);
-                m_NbRemainingBricks--;
+                brickTouched.DestroyThisBrick();
+                NbRemainingBricks--;
 
-                PlayerStatistics.BallsSpeed += 0.5f;
+                PlayerStatistics.BallsSpeed += 0.25f;
                 PlayerStatistics.PlayerNbPoints += 100;
                 break;
             case BrickType.PowerUp_Ball:
-                Destroy(brickTouched.gameObject, 0.1f);
-                m_NbRemainingBricks--;
+                brickTouched.DestroyThisBrick();
+                NbRemainingBricks--;
 
                 CreateBallAtRacket();
                 PlayerStatistics.PlayerNbPoints += 100;
@@ -177,10 +192,16 @@ public class GameCreator : MonoBehaviour
                 break;
         }
 
-        if (m_NbRemainingBricks == 0)
+        if (NbRemainingBricks == 0)
+        {
+            PlayerStatistics.GameEnded = true;
             EventManager.raise(EventType.PLAYER_WON);
+        }
     }
 
+    /// <summary>
+    /// Create and launch a ball from the racket
+    /// </summary>
     public void CreateBallAtRacket()
     {
         GameObject newball = Instantiate(m_BallPrefab);
@@ -189,7 +210,7 @@ public class GameCreator : MonoBehaviour
             m_PlayerRacket.transform.position.x,
             m_PlayerRacket.transform.position.y + newball.GetComponent<SphereCollider>().bounds.size.y * 0.51f + m_PlayerRacket.GetComponent<CapsuleCollider>().bounds.size.y * 0.5f,
             m_PlayerRacket.transform.position.z);
-
-        newball.GetComponent<Ball>().Launch();
+        newball.transform.SetParent(this.transform);
+       newball.GetComponent<Ball>().Launch();
     }
 }
