@@ -37,15 +37,25 @@ public static class PlayerStatistics
         {
             EventManager.raise<int>(EventType.PLAYER_NUMBER_LIFE_CHANGED, value);
             m_PlayerNbLifes = value;
+            if (m_PlayerNbLifes == 0)
+                EventManager.raise(EventType.PLAYER_LOST);
         }
     }
 
     public static int PlayerInitLifes = 3;
 
+    public static float BallsSpeed = 3.0f;
+    private static float BallsInitSpeed = 3.0f;
+
+
+    /// <summary>
+    /// Reset the information of the sattistics of the player : points, life...
+    /// </summary>
     public static void ResetPlayer()
     {
         PlayerNbPoints = 0;
         PlayerNbLifes = PlayerInitLifes;
+        BallsSpeed = BallsInitSpeed;
     }
 
 }

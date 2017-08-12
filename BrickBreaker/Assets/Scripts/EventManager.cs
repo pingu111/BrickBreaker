@@ -8,7 +8,9 @@ using UnityEngine;
 public enum EventType
 {
     PLAYER_NUMBER_LIFE_CHANGED,
-    PLAYER_NUMBER_SCORE_CHANGED
+    PLAYER_NUMBER_SCORE_CHANGED,
+    PLAYER_LOST,
+    PLAYER_WON
 }
 
 public delegate void Callback();

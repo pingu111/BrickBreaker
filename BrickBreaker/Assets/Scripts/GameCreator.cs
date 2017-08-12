@@ -23,15 +23,25 @@ public class GameCreator : MonoBehaviour
     [SerializeField]
     private GameObject m_Ceil = null;
 
-    private Dictionary<int, BrickBehaviour> m_DictionnaryBrickID = new Dictionary<int, BrickBehaviour>();
+    [SerializeField]
+    public GameObject m_BallPrefab = null;
+
+    [SerializeField]
+    private PlayerRacket m_PlayerRacket = null;
+
+    /// <summary>
+    /// Number of remaining bricks on the game, when 0, player won
+    /// </summary>
+    private int m_NbRemainingBricks = -1;
 
     /// <summary>
     /// Initialize the game, bricks
     /// </summary>
     public void CreateGame()
     {
-        m_DictionnaryBrickID.Clear();
+        m_PlayerRacket.InitRacket();
 
+        //Height ratio of the container of the bricks : 1 = all the screen filled with bricks, 0.5 =half the screen filled
         float heightRatio = 0.6f;
 
         // first, set the size of the container to fit the screen as wanted
@@ -85,8 +95,6 @@ public class GameCreator : MonoBehaviour
         Vector3 firstPosition = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, 0f));
         firstPosition.z = m_BrickContainer.transform.position.z;
 
-        int idBrick = 0;
-
         var possibleTypes = Enum.GetValues((typeof(BrickType)));
         for (int i = 0; i < nbBricksX; i ++)
         {
@@ -101,33 +109,64 @@ public class GameCreator : MonoBehaviour
                     firstPosition.z);
                 newBrick.transform.SetParent(m_BrickContainer.transform);
 
-                newBrick.GetComponent<BrickBehaviour>().SetStateThisBrick((BrickType)possibleTypes.GetValue(UnityEngine.Random.Range(0, possibleTypes.Length)), this);
-
-                m_DictionnaryBrickID.Add(idBrick, newBrick.GetComponent<BrickBehaviour>());
-                idBrick++;
+                newBrick.GetComponent<BrickBehaviour>().SetStateThisBrick(GetRandomBrickType(), this);
+                m_NbRemainingBricks++;
             }
         }
     }
 
+
+    public BrickType GetRandomBrickType()
+    {
+        int randomInt = UnityEngine.Random.Range(0, 100);
+
+        if (randomInt < 5)
+            return BrickType.SuperStrong;
+        else if (randomInt < 15)
+            return BrickType.Strong;
+        else if (randomInt < 25)
+            return BrickType.PowerUp_Ball;
+        else if (randomInt < 40)
+            return BrickType.PowerUp_Life;
+        else if (randomInt < 60)
+            return BrickType.PowerUp_Speed;
+        else
+            return BrickType.Normal;
+    }
+
+    /// <summary>
+    /// To call whe na brick is hitten, apply the rules of the given brick
+    /// </summary>
+    /// <param name="brickTouched"></param>
     public void OnBrickWasTouched(BrickBehaviour brickTouched)
     {
         switch (brickTouched.m_ThisBrickType)
         {
             case BrickType.Normal:
                 Destroy(brickTouched.gameObject, 0.1f);
+                m_NbRemainingBricks--;
+
                 PlayerStatistics.PlayerNbPoints += 100;
                 break;
             case BrickType.PowerUp_Life:
                 Destroy(brickTouched.gameObject, 0.1f);
+                m_NbRemainingBricks--;
+
                 PlayerStatistics.PlayerNbPoints += 100;
                 PlayerStatistics.PlayerNbLifes += 1;
                 break;
             case BrickType.PowerUp_Speed:
                 Destroy(brickTouched.gameObject, 0.1f);
+                m_NbRemainingBricks--;
+
+                PlayerStatistics.BallsSpeed += 0.5f;
                 PlayerStatistics.PlayerNbPoints += 100;
                 break;
             case BrickType.PowerUp_Ball:
                 Destroy(brickTouched.gameObject, 0.1f);
+                m_NbRemainingBricks--;
+
+                CreateBallAtRacket();
                 PlayerStatistics.PlayerNbPoints += 100;
                 break;
             case BrickType.Strong:
@@ -136,8 +175,21 @@ public class GameCreator : MonoBehaviour
             case BrickType.SuperStrong:
                 brickTouched.SetStateThisBrick(BrickType.Strong, this);
                 break;
-        }  
+        }
+
+        if (m_NbRemainingBricks == 0)
+            EventManager.raise(EventType.PLAYER_WON);
     }
 
+    public void CreateBallAtRacket()
+    {
+        GameObject newball = Instantiate(m_BallPrefab);
 
+        newball.transform.position = new Vector3(
+            m_PlayerRacket.transform.position.x,
+            m_PlayerRacket.transform.position.y + newball.GetComponent<SphereCollider>().bounds.size.y * 0.51f + m_PlayerRacket.GetComponent<CapsuleCollider>().bounds.size.y * 0.5f,
+            m_PlayerRacket.transform.position.z);
+
+        newball.GetComponent<Ball>().Launch();
+    }
 }
