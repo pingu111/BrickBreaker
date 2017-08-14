@@ -24,6 +24,9 @@ public class BrickBehaviour : MonoBehaviour
     private GameCreator m_Creator = null;
 
     #region BonusMaterial
+    /// <summary>
+    /// All the materials for each bonus
+    /// </summary>
     [SerializeField]
     private Material m_NormalMaterial = null;
     [SerializeField]
@@ -34,10 +37,21 @@ public class BrickBehaviour : MonoBehaviour
     private Material m_SpeedMaterial = null;
     #endregion
 
+    /// <summary>
+    /// Explosion prefab, to insatntiate when this brick is destroyed
+    /// </summary>
     [SerializeField]
     private GameObject m_ExplostionPrefab;
 
+    /// <summary>
+    /// True if this brick is falling, false otherwise
+    /// </summary>
     public bool m_IsBrickFalling = false;
+
+    /// <summary>
+    /// True if this brick is already destroyed, false otherwise
+    /// </summary>
+    private bool m_IsDestroyed = false;
 
     /// <summary>
     /// Init this brick with the given state
@@ -46,6 +60,7 @@ public class BrickBehaviour : MonoBehaviour
     /// <param name="creator"></param>
     public void SetStateThisBrick(BrickType thisBrickType, GameCreator creator)
     {
+        m_IsDestroyed = false;
         m_ThisBrickType = thisBrickType;
         m_Creator = creator;
 
@@ -77,6 +92,12 @@ public class BrickBehaviour : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        // prevent double touch on a brick already in the process of destruction
+        if (m_IsDestroyed)
+        {
+            return;
+        }
+
         if (collision.transform.GetComponent<Ball>() != null)
         {
             if (m_IsBrickFalling)
@@ -95,10 +116,17 @@ public class BrickBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// To call when this brick needs to be destroyed
+    /// </summary>
     public void DestroyThisBrick()
     {
+        if (m_IsDestroyed)
+            return;
+
+        m_IsDestroyed = true;
         GameObject explosion = Instantiate(m_ExplostionPrefab);
         explosion.transform.position = this.transform.position;
-        Destroy(this.gameObject, 0.01f);
+        Destroy(this.gameObject, 0.1f);
     }
 }

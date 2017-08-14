@@ -4,12 +4,21 @@ using UnityEngine.UI;
 
 public class PopupEnd : MonoBehaviour
 {
+    /// <summary>
+    /// Text to display if the player won
+    /// </summary>
     [SerializeField]
     private GameObject m_TextWon = null;
 
+    /// <summary>
+    /// Text to display if the player lost
+    /// </summary>
     [SerializeField]
     private GameObject m_TextLost = null;
 
+    /// <summary>
+    /// Text displaying the highest score of the player
+    /// </summary>
     [SerializeField]
     private Text m_HighestScoreText = null;
 
@@ -52,6 +61,9 @@ public class PopupEnd : MonoBehaviour
             m_TextLost.SetActive(true);
     }
 
+    /// <summary>
+    /// Set the text displaying the highest score of the player
+    /// </summary>
     private void GetHighScore()
     {
         if(PlayerPrefs.HasKey("Highscore"))

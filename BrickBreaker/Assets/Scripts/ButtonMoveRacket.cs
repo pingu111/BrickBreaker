@@ -8,12 +8,21 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class ButtonMoveRacket : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
+    /// <summary>
+    /// True if this arrrow is the right one, false if left one
+    /// </summary>
     [SerializeField]
     private bool m_IsRightArrow = false;
 
+    /// <summary>
+    /// The input manager of the racket
+    /// </summary>
     [SerializeField]
     private InputManager m_InputManager = null;
 
+    /// <summary>
+    /// True if the arrow is currently pressed, false otherwise
+    /// </summary>
     private bool m_IsCurrentlyPressed = false;
 
     public void OnPointerDown(PointerEventData eventData)
@@ -40,7 +49,6 @@ public class ButtonMoveRacket : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         this.GetComponent<UnityEngine.UI.Image>().color = new Color(1, 1, 1, 0.2f);
     }
 
-
     void Update()
     {
         if (!m_IsCurrentlyPressed)
@@ -54,6 +62,5 @@ public class ButtonMoveRacket : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             m_InputManager.OnClickLeftArrow();
         }
-
     }
 }

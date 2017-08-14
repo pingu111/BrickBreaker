@@ -5,29 +5,69 @@ using System;
 
 public class GameCreator : MonoBehaviour
 {
+    #region Prefabs
+    /// <summary>
+    /// Prefab of one brick, to build the level
+    /// </summary>
     [SerializeField]
     private GameObject m_PrefabBrick = null;
 
+    /// <summary>
+    /// Prefab of one ball
+    /// </summary>
+    [SerializeField]
+    public GameObject m_BallPrefab = null;
+    #endregion
+
+    #region Intial Game Objects
+    /// <summary>
+    /// Container of the bricks : used to be filled 
+    /// with bricks
+    /// </summary>
     [SerializeField]
     private GameObject m_BrickContainer = null;
 
+    /// <summary>
+    /// Ground object, will make the ball bounce
+    /// and remove a life of the player
+    /// </summary>
     [SerializeField]
     private GameObject m_Ground = null;
 
+    /// <summary>
+    /// Wall object, will make the ball bouunce
+    /// </summary>
     [SerializeField]
     private GameObject m_WallLeft = null;
 
+    /// <summary>
+    /// Wall object, will make the ball bouunce
+    /// </summary>
     [SerializeField]
     private GameObject m_WallRight = null;
 
+    /// <summary>
+    /// Ceil object, will make the ball bouunce
+    /// </summary>
     [SerializeField]
     private GameObject m_Ceil = null;
 
-    [SerializeField]
-    public GameObject m_BallPrefab = null;
-
+    /// <summary>
+    /// The racket of the player
+    /// </summary>
     [SerializeField]
     private PlayerRacket m_PlayerRacket = null;
+    #endregion
+
+    /// <summary>
+    /// Configuration of the level : number of horizontal bricks
+    /// </summary>
+    private int nbBricksX = 10;
+
+    /// <summary>
+    /// Configuration of the level : number of veryical bricks
+    /// </summary>
+    private int nbBricksY = 8;
 
     /// <summary>
     /// Number of remaining bricks on the game, when 0, player won
@@ -52,7 +92,7 @@ public class GameCreator : MonoBehaviour
     {
         m_PlayerRacket.InitRacket();
 
-        //Height ratio of the container of the bricks : 1 = all the screen filled with bricks, 0.5 =half the screen filled
+        //Height ratio of the container of the bricks : 1 = all the screen filled with bricks, 0.5 = half the screen filled
         float heightRatio = 0.6f;
 
         // first, set the size of the container to fit the screen as wanted
@@ -63,8 +103,7 @@ public class GameCreator : MonoBehaviour
         // then, place it on the screen
         m_BrickContainer.transform.localPosition = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1 - heightRatio * 0.5f, 0));
 
-
-        // set the borders
+        // set the size of the 4 borders
         m_Ground.transform.localScale = new Vector3(widthToFillScreen, 1f, 1f);
         Vector3 tmpPos = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0f, 0f));
         tmpPos.y -= m_Ground.GetComponent<BoxCollider>().bounds.size.y / 2;
@@ -85,19 +124,17 @@ public class GameCreator : MonoBehaviour
         tmpPos.y += m_Ceil.GetComponent<BoxCollider>().bounds.size.y / 2;
         m_Ceil.transform.localPosition = tmpPos;
 
+        //create all the bricks
         CreateBricks();
     }
 
     /// <summary>
-    /// Create the bricks, the container needs to be created
+    /// Create the bricks, the container needs to be created before calling this function
     /// </summary>
     private void CreateBricks()
     {
+        //reset
         NbRemainingBricks = 0;
-
-        //TODO : add in a file
-        int nbBricksX = 10;
-        int nbBricksY = 8;
 
         if (nbBricksX == 0 || nbBricksY == 0)
             return;
@@ -123,6 +160,7 @@ public class GameCreator : MonoBehaviour
 
                 newBrick.GetComponent<BrickBehaviour>().SetStateThisBrick(GetRandomBrickType(), this);
                 NbRemainingBricks++;
+                newBrick.name = "Brick_" + NbRemainingBricks;
             }
         }
     }
@@ -156,17 +194,22 @@ public class GameCreator : MonoBehaviour
     /// <param name="brickTouched"></param>
     public void OnBrickFallingTouched(BrickBehaviour brickTouched, bool touchedByBall)
     {
+        if (PlayerStatistics.GameEnded)
+            return;
+
         switch (brickTouched.m_ThisBrickType)
         {
             case BrickType.Normal:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
+
                 if(touchedByBall)
                     PlayerStatistics.PlayerNbPoints += 350;
                 break;
             case BrickType.PowerUp_Life:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
+
                 if (touchedByBall)
                 {
                     PlayerStatistics.PlayerNbPoints += 300;
@@ -176,6 +219,7 @@ public class GameCreator : MonoBehaviour
             case BrickType.PowerUp_Speed:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
+
                 if (touchedByBall)
                 {
                     PlayerStatistics.BallsSpeed += 0.25f;
@@ -185,6 +229,7 @@ public class GameCreator : MonoBehaviour
             case BrickType.PowerUp_Ball:
                 brickTouched.DestroyThisBrick();
                 NbRemainingBricks--;
+
                 if (touchedByBall)
                 {
                     CreateBallAtRacket();
@@ -221,13 +266,19 @@ public class GameCreator : MonoBehaviour
 
         if (NbRemainingBricks == 0)
         {
-            if(!PlayerStatistics.GameEnded)
-            {
-                PlayerStatistics.GameEnded = true;
-                PlayerPrefs.SetInt("Highscore", PlayerStatistics.PlayerNbPoints);
-                EventManager.raise(EventType.PLAYER_WON);
-            }
+            PlayerStatistics.GameEnded = true;
+            PlayerStatistics.PlayerNbPoints += PlayerStatistics.PlayerNbLifes * 1000;
 
+            // keep the highest score
+            if (PlayerPrefs.HasKey("Highscore"))
+            {
+                if (PlayerPrefs.GetInt("Highscore") < PlayerStatistics.PlayerNbPoints)
+                    PlayerPrefs.SetInt("Highscore", PlayerStatistics.PlayerNbPoints);
+            }
+            else 
+                PlayerPrefs.SetInt("Highscore", PlayerStatistics.PlayerNbPoints);
+
+            EventManager.raise(EventType.PLAYER_WON);
         }
     }
 
@@ -238,6 +289,9 @@ public class GameCreator : MonoBehaviour
     /// <param name="brickTouched"></param>
     public void NonFallingBrickTouchedByBall(BrickBehaviour brickTouched)
     {
+        if (PlayerStatistics.GameEnded)
+            return;
+
         switch (brickTouched.m_ThisBrickType)
         {
             case BrickType.Strong:
@@ -260,6 +314,9 @@ public class GameCreator : MonoBehaviour
     /// </summary>
     public void CreateBallAtRacket()
     {
+        if (PlayerStatistics.GameEnded)
+            return;
+
         GameObject newball = Instantiate(m_BallPrefab);
 
         newball.transform.position = new Vector3(
@@ -267,6 +324,6 @@ public class GameCreator : MonoBehaviour
             m_PlayerRacket.transform.position.y + newball.GetComponent<SphereCollider>().bounds.size.y * 0.51f + m_PlayerRacket.GetComponent<CapsuleCollider>().bounds.size.y * 0.5f,
             m_PlayerRacket.transform.position.z);
         newball.transform.SetParent(this.transform);
-       newball.GetComponent<Ball>().Launch();
+        newball.GetComponent<Ball>().Launch();
     }
 }

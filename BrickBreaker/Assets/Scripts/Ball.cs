@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Ball : MonoBehaviour
 {
-	
-    /// <summary>
+	/// <summary>
     /// Set the velocity to a constant magnitude
     /// </summary>
     public void LateUpdate ()
@@ -22,7 +21,7 @@ public class Ball : MonoBehaviour
         EventManager.addActionToEvent(EventType.PLAYER_LOST, DestroyBall);
         EventManager.addActionToEvent(EventType.PLAYER_WON, DestroyBall);
 
-        Vector3 randomInit = new Vector3(Random.Range(-30, 30) / 30.0f, Random.Range(0, 30) / 30.0f, 0);
+        Vector3 randomInit = new Vector3(Random.Range(-100, 100) / 100f, 1.0f, 0);
         randomInit = Vector3.Normalize(randomInit) * PlayerStatistics.BallsSpeed;
         this.GetComponent<Rigidbody>().velocity = randomInit;
     }

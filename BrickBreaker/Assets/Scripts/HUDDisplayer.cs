@@ -2,14 +2,23 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class HUDDisplayer : MonoBehaviour {
-
+public class HUDDisplayer : MonoBehaviour
+{
+    /// <summary>
+    /// Text displaying the current number of lifes of the player
+    /// </summary>
     [SerializeField]
     private Text m_NumberLifesText = null;
 
+    /// <summary>
+    /// Text displaying the current number of points of the player
+    /// </summary>
     [SerializeField]
     private Text m_NumberPointsText = null;
 
+    /// <summary>
+    /// Popup annoucing the end of the game
+    /// </summary>
     [SerializeField]
     private PopupEnd m_PopupGameOver = null;
 

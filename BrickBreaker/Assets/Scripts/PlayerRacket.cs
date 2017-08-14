@@ -9,7 +9,7 @@ public class PlayerRacket : MonoBehaviour
     private float m_ClampedPositionX = -1.0f;
 
     /// <summary>
-    /// Set the intiail position of the racket
+    /// Set the intiial position of the racket
     /// </summary>
 	public void InitRacket()
     {
