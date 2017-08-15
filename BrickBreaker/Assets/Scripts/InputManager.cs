@@ -12,7 +12,7 @@ public class InputManager : MonoBehaviour
     /// <summary>
     /// Speed of the player's racket
     /// </summary>
-    private float m_Speed = 0.15f;
+    private float m_Speed = 15f;
 
 	// Update is called once per frame
 	void Update ()
@@ -21,16 +21,16 @@ public class InputManager : MonoBehaviour
         {
             if(Input.acceleration.x != 0)
             {
-                m_PlayerRacket.RacketGoToX(m_Speed * Input.acceleration.x);
+                m_PlayerRacket.RacketGoToX(m_Speed * Input.acceleration.x * Time.deltaTime);
             }
         }
         else if(Input.GetKey(KeyCode.LeftArrow))
         {
-            m_PlayerRacket.RacketGoToX(-m_Speed);
+            m_PlayerRacket.RacketGoToX(-m_Speed * Time.deltaTime);
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            m_PlayerRacket.RacketGoToX(m_Speed);
+            m_PlayerRacket.RacketGoToX(m_Speed * Time.deltaTime);
         }
     }
 
@@ -39,7 +39,7 @@ public class InputManager : MonoBehaviour
     /// </summary>
     public void OnClickLeftArrow()
     {
-        m_PlayerRacket.RacketGoToX(- m_Speed);
+        m_PlayerRacket.RacketGoToX(- m_Speed * Time.deltaTime);
     }
 
     /// <summary>
@@ -47,6 +47,6 @@ public class InputManager : MonoBehaviour
     /// </summary>
     public void OnClickRightArrow()
     {
-        m_PlayerRacket.RacketGoToX(m_Speed);
+        m_PlayerRacket.RacketGoToX(m_Speed * Time.deltaTime);
     }
 }
